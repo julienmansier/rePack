@@ -1,36 +1,43 @@
-import argparse
+import requests
+import subprocess
 import os
-import json
+import argparse
 
-def validate_file(file_path):
-    """Validate that the given file exists and is readable."""
-    if not os.path.isfile(file_path):
-        raise argparse.ArgumentTypeError(f"File '{file_path}' does not exist.")
-    if not os.access(file_path, os.R_OK):
-        raise argparse.ArgumentTypeError(f"File '{file_path}' is not readable.")
-    return file_path
 
-def validate_directory(directory_path):
-    """Validate that the given directory exists and is writable."""
-    if not os.path.isdir(directory_path):
-        raise argparse.ArgumentTypeError(f"Directory '{directory_path}' does not exist.")
-    if not os.access(directory_path, os.W_OK):
-        raise argparse.ArgumentTypeError(f"Directory '{directory_path}' is not writable.")
-    return directory_path
 
 def main():
-    parser = argparse.ArgumentParser(description="Process a JSON file and a directory.")
-    parser.add_argument("json_file", type=validate_file, help="Path to the JSON file")
-    parser.add_argument("directory", type=validate_directory, help="Path to the directory")
-    
+    parser = argparse.ArgumentParser(description="Process needed files")
+    parser.add_argument('--hash', type=str,required=True, help="File Hash")
+    parser.add_argument( '--token', type=str,required=True, help="API Token")
+    parser.add_argument( '--url', type=str,required=True, help="Spectra Analyze URL")
     args = parser.parse_args()
-    
-    # Load and print the JSON file content
-    with open(args.json_file, 'r') as json_file:
-        data = json.load(json_file)
-        
-    
-    #print(f"Directory '{args.directory}' is valid.")
+
+    # Change the values of hash_value and token
+    hash_value = args.hash
+    token = args.token
+    url = args.url
+
+    url = f"https://{url}/api/samples/{hash_value}/unpacked/"
+
+    headers = {
+        "Authorization": f"Token {token}"
+    }
+
+    # Add verify=False in the request if you are using a self-signed SSL certificate
+    response = requests.get(url, headers=headers)
+    response.raw.decode_content = True
+
+    with open("filename", "wb") as f:
+        f.write(response.content)
+        f.close()
+
+    current_working_directory = os.getcwd()
+    dir = current_working_directory+'/'+ hash_value +'.rl/infected/'
+
+    mkdir = subprocess.run(['mkdir', 'extracted'], capture_output=True, text=True)
+    unzip = subprocess.run(['tar', 'xvf' ,'filename'], capture_output=True, text=True)
+    mv = subprocess.run(['cp', '-r', dir , current_working_directory+'/extracted/'], capture_output=True, text=True)
+
 
 if __name__ == "__main__":
     main()
