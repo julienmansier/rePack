@@ -7,7 +7,7 @@ This script downloads the extracted files of a given sample from Spectra Analyze
 
 #### Running the script
 ```
-python3 rePack.py --hash {add sha1 hash} --url {add analyze base url} --token {API token}
+python3 rePack.py --hash {sha1 hash} --url {Analyze base url} --token {API token}
 ```
 
 ###### Example
