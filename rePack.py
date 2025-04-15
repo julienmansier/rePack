@@ -17,14 +17,14 @@ def main():
     token = args.token
     url = args.url
 
-    url = f"https://{url}/api/samples/{hash_value}/unpacked/"
+    full_url = f"https://{url}/api/samples/{hash_value}/unpacked/"
 
     headers = {
         "Authorization": f"Token {token}"
     }
 
     # Add verify=False in the request if you are using a self-signed SSL certificate
-    response = requests.get(url, headers=headers)
+    response = requests.get(full_url, headers=headers)
     response.raw.decode_content = True
 
     with open("filename", "wb") as f:
